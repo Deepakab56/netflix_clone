@@ -1,14 +1,23 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import AuthContext from './AuthContext';
 import { json } from 'react-router-dom';
 
 
 function Setup(props) {
-  const [formdata, setformdata] = useState()
+  const [formdata, setformdata] = useState([])
   const { setupPassword, message, setmessage } = useContext(AuthContext)
+  const inputfield = useRef()
+  const [error, seterror] = useState({
+    email: []
+  })
+  const [dirty, setdirty] = useState({
+    email: false
+  })
+
 
   const local = localStorage.getItem("user")
   const userdata = JSON.parse(local)
+
 
   useEffect(() => {
     setformdata(userdata)
@@ -23,11 +32,65 @@ function Setup(props) {
       [name]: value
     }))
   }
+  const validate = () => {
+    const errordata = {}
+    errordata.email = []
+    errordata.password = []
+    if (!formdata.email) {
+      errordata.email.push("please enter the email")
+    }
+
+    const emailregax = /^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/;
+
+    if (formdata.email) {
+      if (!emailregax.test(formdata.email)) {
+        errordata.email.push("please enter the valid email")
+      }
+    }
+
+
+    if (!formdata.password) {
+      errordata.password.push("please enter the password")
+    }
+    seterror(errordata)
+  }
+
+  useEffect(validate, [formdata])
+
+
+  const isvalid = () => {
+    let valid = true
+    for (let controls in error) {
+      if (error[controls].length > 0) {
+        valid = false
+      }
+    }
+    return valid
+  }
+
+  const blurChange = (e) => {
+    const { name } = e.target
+    setdirty((prev) => ({
+      ...prev,
+      [name]: true
+    }))
+    validate()
+  }
 
 
   const register = (e) => {
     e.preventDefault()
-    setupPassword(formdata)
+    if (isvalid()) {
+      setupPassword(formdata)
+    }
+    else {
+      const currentvalue = inputfield.current.value
+      if (!currentvalue) {
+        Object.keys(dirty).forEach((abc) => dirty[abc] = true)
+      }
+      setmessage("please resolve error")
+    }
+
 
   }
   return (
@@ -45,11 +108,13 @@ function Setup(props) {
               <form action="">
                 <div className="inp1 mt-2 mx-4 px-4">
                   <label htmlFor="" className="form-label px-2">Email</label>
-                  <input type="text" name="email" id="" value={formdata?.email} onChange={handleChange} />
+                  <input type="text" name="email" id="" value={formdata?.email} onChange={handleChange} ref={inputfield} onBlur={blurChange} />
                 </div>
+                <div className="text-danger mx-4">{dirty["email"] && error["email"] ? error["email"] : ''}</div>
                 <div className="inp2 m-3">
                   <label htmlFor="" className='form-label px-2' > Password</label>
-                  <input type="password" name="password" id="" onChange={handleChange} />
+                  <input type="password" name="password" id="" onChange={handleChange} ref={inputfield} onBlur={blurChange} />
+                  <div className="text-danger">{dirty["password"]&& error["password"] ? error["password"] :""}</div>
                 </div>
               </form>
 
@@ -61,7 +126,7 @@ function Setup(props) {
 
 
             <div className="btn btn-danger color" onClick={register}>Register</div>
-
+<div className="text-white">{message}</div>
           </div>
         </div>
       </div>

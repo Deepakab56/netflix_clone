@@ -42,48 +42,44 @@ function Signup(props) {
         seterror(errordata)
     }
 
-useEffect(validate ,[formdata])
+    useEffect(validate, [formdata])
 
 
-const isvalid=()=>{
-    let valid = true
-    for(let controls in error)
-    {
-        if(error[controls].length>0)
-        {
-            valid=false
+    const isvalid = () => {
+        let valid = true
+        for (let controls in error) {
+            if (error[controls].length > 0) {
+                valid = false
+            }
         }
+        return valid
     }
-    return valid
-}
 
-const blurChange=(e)=>{
-const{name} = e.target
-setdirty((prev)=>({
-    ...prev,
-    [name]:true
-}))
-validate()
-}
+    const blurChange = (e) => {
+        const { name } = e.target
+        setdirty((prev) => ({
+            ...prev,
+            [name]: true
+        }))
+        validate()
+    }
 
     const register = (e) => {
         e.preventDefault()
-        if(isvalid())
-        {
+        if (isvalid()) {
             signup(formdata)
         }
-        else{
-             const cuurentvalue = inputfield.current.value
-             if(!cuurentvalue)
-             {
-                Object.keys(dirty).forEach((abc)=>dirty[abc] = true)
+        else {
+            const cuurentvalue = inputfield.current.value
+            if (!cuurentvalue) {
+                Object.keys(dirty).forEach((abc) => dirty[abc] = true)
 
-             }
-           setmessage("please resolve error")
+            }
+            setmessage("please resolve error")
         }
     }
 
-    
+
     return (
         <div>
             <div className="caption mt-2">
@@ -101,8 +97,8 @@ validate()
                     id=""
                     placeholder="Email address"
                     className="  bg-transparent p-3 text-white w-50 fs-5"
-ref={inputfield}
-onBlur={blurChange}
+                    ref={inputfield}
+                    onBlur={blurChange}
                 />
 
 

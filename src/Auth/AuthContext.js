@@ -68,11 +68,14 @@ export const AuthProvider = ({ children }) => {
         if (response.ok) {
             const user = await response.json()
             setuser(user)
-
+           setmessage("sucessfully proceed")
             localStorage.setItem("user", JSON.stringify(user))
            setTimeout(() => {
             navigate("/homescreen")
            }, 3000);
+        }
+        else{
+            setmessage("something went wrong")
         }
     }
 
